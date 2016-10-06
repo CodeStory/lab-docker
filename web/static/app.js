@@ -9,22 +9,24 @@ lab.controller('LabCtrl', function ($scope, $http) {
     $scope.adjective2 = "";
     $scope.verb = "";
 
-    $http.get('/words/noun').success(function(data) {
+    $http.get('/words/noun1').success(function(data) {
         $scope.noun1 = data;
     });
-    $http.get('/words/noun').success(function(data) {
+    $http.get('/words/noun2').success(function(data) {
+        data.word = data.word + "."
         $scope.noun2 = data;
     });
-    $http.get('/words/adjective').success(function(data) {
+    $http.get('/words/adjective1').success(function(data) {
+        data.word = data.word.charAt(0).toUpperCase() + data.word.substr(1)
         $scope.adjective1 = data;
     });
-    $http.get('/words/adjective').success(function(data) {
+    $http.get('/words/adjective2').success(function(data) {
         $scope.adjective2 = data;
     });
     $http.get('/words/verb').success(function(data) {
         $scope.verb = data;
     });
-    
+
     $scope.share = function() {
       var sentence = $scope.noun1 + " " + $scope.adjective1 + " " + $scope.verb + " " + $scope.noun2 + " " + $scope.adjective2
       $http.post('http://docker.local:9000/likes',{'name':sentence})

@@ -7,31 +7,29 @@ export GOOGLE_ZONE="europe-west1-d"
 export GOOGLE_DISK_SIZE="1000"
 export GOOGLE_MACHINE_TYPE="custom-2-8192"
 
-docker-machine create -d google --google-address ip-kv kv
+docker-machine create -d google gce-manager
+docker-machine create -d google gce-worker1
+docker-machine create -d google gce-worker2
+docker-machine create -d google gce-worker3
 
-docker $(docker-machine config kv) run \
-    -d -p "8500:8500" \
-    --name="consul" --restart "always" -h "consul" \
-    progrium/consul -server -bootstrap
+docker $(docker-machine config gce-manager) \
+  swarm init \
+  --listen-addr $(gcloud compute instances list gce-manager --format='value(networkInterfaces.networkIP)'):2377 \
+  --advertise-addr $(gcloud compute instances list gce-manager --format='value(networkInterfaces.networkIP)'):2377
 
-docker-machine create -d google \
-    --google-address ip-master \
-    --swarm --swarm-master \
-    --swarm-discovery="consul://$(docker-machine ip kv):8500" \
-    --engine-opt="cluster-store=consul://$(docker-machine ip kv):8500" \
-    --engine-opt="cluster-advertise=eth0:2376" \
-    master
+docker $(docker-machine config gce-worker1) \
+  swarm join $(docker-machine ip gce-manager):2377 \
+  --listen-addr $(gcloud compute instances list gce-worker1 --format='value(networkInterfaces.networkIP)'):2377 \
+  --token $(docker $(docker-machine config gce-manager) swarm join-token worker -q)
 
-for i in {1..4}; do
-  name=$(printf "node-%0.2d" $i)
-  ip=$(printf "ip-node%0.2d" $i)
+docker $(docker-machine config gce-worker2) \
+  swarm join $(docker-machine ip gce-manager):2377 \
+  --listen-addr $(gcloud compute instances list gce-worker2 --format='value(networkInterfaces.networkIP)'):2377 \
+  --token $(docker $(docker-machine config gce-manager) swarm join-token worker -q)
 
-  docker-machine -D create -d google --swarm \
-      --google-address $ip \
-      --swarm-discovery="consul://$(docker-machine ip kv):8500" \
-      --engine-opt="cluster-store=consul://$(docker-machine ip kv):8500" \
-      --engine-opt="cluster-advertise=eth0:2376" \
-      $name
-done
+docker $(docker-machine config gce-worker3) \
+  swarm join $(docker-machine ip gce-manager):2377 \
+  --listen-addr $(gcloud compute instances list gce-worker3 --format='value(networkInterfaces.networkIP)'):2377 \
+  --token $(docker $(docker-machine config gce-manager) swarm join-token worker -q)
 
-docker $(docker-machine config --swarm master) network create --driver overlay lab-net
+docker $(docker-machine config gce-manager) info

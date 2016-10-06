@@ -5,25 +5,21 @@ services:
     build: web
     image: dockerdemos/lab-web
     ports: ["80:80"]
-    links: ["words-dispatcher:words"]
 
-  words-dispatcher:
+  words:
     build: words-dispatcher
     image: dockerdemos/lab-words-dispatcher
     expose: ["8080"]
-    links: ["words-java:words-java"]
 
   words-java:
     build: words-java
     image: dockerdemos/lab-words-java
     expose: ["8080"]
-    links: ["db:mongo"]
 
   db-ui:
-    image: mongo-express:0.30.43
+    image: mongo-express:0.31.0
     ports: ["8081:8081"]
-    links: ["db:mongo"]
 
-  db:
-    image: mongo:3.2.4
+  mongo:
+    image: mongo:3.3.15
     expose: ["27017"]

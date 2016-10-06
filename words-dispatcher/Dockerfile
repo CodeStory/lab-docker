@@ -1,4 +1,4 @@
-FROM golang:1.6.1-alpine
+FROM golang:1.7.1-alpine
 
 EXPOSE 8080
 CMD ["./dispatcher"]
