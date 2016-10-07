@@ -229,7 +229,7 @@ If you are on the Google Cloud Swarm cluster:
 6. Get the port of the `web` service.
 
   ```
-  docker service inspect -f '{{(index .Endpoint.Ports 0).PublishedPort}}' MY-UNIQUE-TEAM-NAME_web
+  docker service inspect --pretty MY-UNIQUE-TEAM-NAME_web | tail -n1
   ```
 
 7. Open the browser on `http://104.155.53.144:PORT`
