@@ -281,4 +281,4 @@ Cadavres Exquis is a French word game, you'll find more on
 # How did we create the Swarm?
 
 The Swarm has been created on Google Cloud with the [init_swarm_google.sh](init_swarm_google.sh) script. Take a look to what we do there but you'll need an account and this may cost you money.
-You can also try it on your own laptop by running the [init_swarm_virtualbox.sh](init_swarm_box.sh), you'll need virtualbox and `docker-machine`
+You can also try it on your own laptop by running the [init_swarm_vbox.sh](init_swarm_vbox.sh), you'll need virtualbox and `docker-machine`
